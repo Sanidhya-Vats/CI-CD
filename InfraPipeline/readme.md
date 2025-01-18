@@ -1,87 +1,108 @@
-# CI/CD Pipeline for Terraform Deployment
 
-This README explains the CI/CD pipeline designed for running Terraform commands on Azure infrastructure. The pipeline automates the initialization, planning, manual validation, and application of Terraform configurations in Azure.
 
-## Pipeline Overview
+---
 
-The pipeline consists of the following stages:
+# CI/CD Pipeline for Infrastructure Provisioning in Azure DevOps
 
-1. **Terraform Init**: Initializes the Terraform configuration and backend.
-2. **Terraform Plan**: Generates an execution plan for Terraform.
-3. **Manual Validation**: Provides manual approval before applying Terraform changes.
-4. **Terraform Apply**: Applies the changes as per the Terraform plan.
+This repository provides a set of YAML configuration files for setting up Continuous Integration and Continuous Deployment (CI/CD) pipelines in Azure DevOps. The `.pipeline` folder contains multiple YAML files that define different stages, steps, and jobs for deploying resources using **Terraform**.
+
+This README explains how to link these YAML files to Azure DevOps and set up a CI/CD pipeline that automates infrastructure deployment.
+
+## Features
+
+- **Multi-stage pipeline**: Includes multiple stages like build, test, and deploy.
+- **Modular design**: Multiple YAML files for specific pipeline steps (e.g., staging, jobs, or steps) that can be linked together.
+- **Terraform automation**: Automates infrastructure provisioning using Terraform scripts.
+- **Azure DevOps integration**: Simplifies integration with Azure DevOps and automates resource management on Azure.
+
+## Folder Structure
+
+```
+InfraPipeline/
+├── .pipeline/
+│   ├── stages-pipeline.yml          # Multi-Stage Azure Pipeline configuration
+│   ├── jobs-pipeline.yml         # Jobbed Azure Pipeline configuration
+│   ├── steps-pipelines.yml        # Stepped Azure Pipeline configuration
+│   └── README.md                   # Documentation for pipeline configurations
+├── environments/dev               # Terraform configurations for infrastructure provisioning
+└── modules/                       # Modular Terraform configurations for provisioning infrastructure
+```
+
+- **.pipeline/stages-pipeline.yml**: The YAML file that have multiple Stages for Testing , Planning and Deployment.
+- **.pipeline/jobs-pipeline.yml**: The YAML file that have multiple Jobs .
+- **.pipeline/steps-pipelines.yml **: The YAML file that have multiple Tasks .
+
+Each YAML file is intended for different stages, steps, or jobs in your pipeline, allowing for modular and easy-to-manage pipeline configurations.
 
 ## Prerequisites
 
-Before using this pipeline, ensure the following prerequisites are met:
+Before setting up your Azure DevOps pipeline, ensure you have the following prerequisites:
 
-### 1. **Azure DevOps Setup**
-   - **Service Connection**: A service connection to Azure (ARM) must be created in Azure DevOps for authentication:
-     - Go to **Project Settings > Service Connections**.
-     - Add a new **Azure Resource Manager** connection with service principal or managed identity authentication.
-     - Name the connection (in this case, `Petroleum-pipeline`).
+- **Azure DevOps Organization**: An Azure DevOps account and a project where you will configure the pipeline.
+- **Azure Subscription**: Access to an active Azure subscription to provision resources.
+- **Service Connection**: An Azure service connection configured in Azure DevOps to authenticate the pipeline with your Azure subscription.
+- **Terraform**: Ensure Terraform is installed and configured for your infrastructure provisioning.
+- **Git**: Installed to clone the repository.
 
-### 2. **Azure Resources for Terraform Backend**
-   - Terraform stores its state in an **Azure Storage Account**. Ensure the following resources are created:
-     - **Resource Group**: For the storage account (e.g., `pipeline-rg`).
-     - **Storage Account**: Used for storing the state files (e.g., `pipelinesg`).
-     - **Storage Container**: To hold the `.tfstate` files (e.g., `pipelinecn`).
-   - These resources should be referenced correctly in the pipeline.
+## Setting Up the Azure DevOps Pipeline
 
-### 3. **Terraform Version**
-   - The pipeline installs and uses the latest version of Terraform. Make sure that the specified version is compatible with your Terraform configurations.
+### 1. Clone the Repository
 
-### 4. **Manual Validation Setup**
-   - The manual validation step is included to ensure human intervention before applying the Terraform plan.
-   - You can configure this step by specifying the email addresses of users who will approve or validate the changes:
-     - Make sure that the email addresses specified in the `notifyUsers` and `approvers` fields are correct.
+Clone this repository to your local machine or directly within your Azure DevOps project.
 
-### 5. **Environment Details**
-   - The pipeline references a specific **Azure environment** via the service connection (`Petroleum-pipeline`). Ensure that the service connection is set up correctly and has the necessary permissions to manage Azure resources.
-   - If you are deploying to a different cloud provider, update the `environmentServiceNameAzureRM` or add an equivalent service connection (e.g., `environmentServiceNameGCP` for Google Cloud Platform).
+```bash
+git clone https://github.com/Sanidhya-Vats/CI-CD.git
+cd CI-CD/InfraPipeline
+```
 
-## Steps to Use
+### 2. Create a New Pipeline in Azure DevOps
 
-### 1. **Clone the Repository**
-   Clone the repository to your local machine to modify the YAML pipeline and configuration files as needed.
+- Navigate to your **Azure DevOps** project.
+- Go to the **Pipelines** section.
+- Click **New Pipeline** and select **Azure Repos Git** as the source.
+- Choose the repository that contains the pipeline YAML files.
+- When prompted for a pipeline configuration, select **YAML** and point it to the `.pipeline/stages-pipeline.yml` file.
 
-### 2. **Modify the Trigger and Pool Details**
-   The pipeline is configured to run on a specific branch (`dev`) and an agent pool (`Agent-Cool`). Adjust these settings based on your project’s requirements:
-   - **Trigger**: Specify the branch or branches that will trigger the pipeline.
-   - **Pool**: Choose the appropriate agent pool for your pipeline based on the environment where the Terraform tasks will be executed.
+### 3. Link the YAML Files
 
-   Example:
-   ```yaml
-   trigger:
-     - your-branch-name
-   pool: your-pool-name
-   ```
+In Azure DevOps, the pipeline is structured using multiple stages YAML files for different steps or jobs. The main pipeline YAML (`stages-pipeline.yml`) 
 
-### 3. **Create an Azure Service Connection**
-   - Create a service connection in Azure DevOps that allows the pipeline to authenticate and manage Azure resources.
-   - Name this service connection `Petroleum-pipeline`, or adjust the name in the YAML pipeline as per your setup.
 
-### 4. **Ensure Terraform Backend Configuration**
-   Ensure the backend configuration is properly set up in your Azure environment:
-   - Resource Group: `pipeline-rg`
-   - Storage Account: `pipelinesg`
-   - Container Name: `pipelinecn`
+### 4. Configure Service Connections and Variables
 
-   These resources store the Terraform state file (`pipeline.terraform.tfstate`). Adjust the names as needed if your setup differs.
+- **Service Connection**: Set up a service connection in Azure DevOps under **Project Settings > Service Connections** to enable Azure DevOps to authenticate with your Azure subscription. Make sure to reference this service connection in the yaml.
 
-### 5. **Manual Validation Setup**
-   - The manual validation step requires specifying users who will approve the Terraform apply action.
-   - Ensure that the email addresses in the `notifyUsers` and `approvers` fields are correct and active.
+### 5. Commit and Push Changes
 
-### 6. **Run the Pipeline**
-   - Once all configurations are complete, push changes to the specified branch or manually trigger the pipeline from the Azure DevOps interface.
-   - The pipeline will execute the Terraform commands in sequence, providing a manual approval stage before applying the changes.
+Once the YAML file is configured, commit the changes to your repository to trigger the pipeline.
 
-## Key Notes
+```bash
+git add .
+git commit -m "Add Azure Pipeline configuration"
+git push origin main
+```
 
-- Ensure that the **Azure service connection** is configured correctly, and the storage account/container for the backend exists.
-- You can modify the pipeline stages to include additional validation, testing, or deployment steps as per your project needs.
-- The `ManualValidation` task adds a layer of security to prevent accidental changes without human oversight.
-- Always review the Terraform plan before applying changes to production environments.
+### 6. Monitor the Pipeline
 
-By following these steps and prerequisites, you can efficiently use this pipeline for managing Terraform deployments in Azure.
+After pushing the changes, go to the **Pipelines** section in Azure DevOps and monitor the pipeline's progress. Each stage defined in the YAML file will be executed, running the appropriate steps to provision your resources using Terraform.
+
+## Contributing
+
+We welcome contributions! If you have suggestions or improvements for the pipeline configurations, feel free to open a pull request.
+
+### How to Contribute
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-name`).
+3. Make your changes.
+4. Commit your changes (`git commit -am 'Add new feature'`).
+5. Push to the branch (`git push origin feature-name`).
+6. Open a pull request.
+
+## License
+
+This repository is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+This README outlines how to set up, configure, and use multiple YAML files to create a modular Azure DevOps pipeline for deploying resources using Terraform. It also includes instructions for linking and managing each YAML file as part of a cohesive pipeline in Azure DevOps.
