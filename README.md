@@ -30,7 +30,7 @@ CI-CD/
 ### Directories:
 
 1. **InfraPipeline/**:
-   - Contains all files related to infrastructure provisioning, including **Terraform** configurations for creating and managing cloud resources, **Ansible** playbooks for configuration management, and **pipeline YAML files** for continuous integration and deployment.
+   - Contains all files related to infrastructure provisioning, including **Terraform** configurations for creating and managing cloud resources,  and **pipeline YAML files** for continuous integration and deployment.
 
 
 ## Setting Up CI/CD Pipeline
