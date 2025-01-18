@@ -4,7 +4,7 @@
 
 # CI/CD Pipeline Repository
 
-This repository contains resources and configurations for setting up Continuous Integration (CI) and Continuous Deployment (CD) pipelines. The pipelines are designed to automate infrastructure provisioning, application deployments, and resource management across various environments (e.g., Azure, AWS, GCP, etc.). The goal is to provide automated workflows to streamline deployments and infrastructure management, leveraging **Infrastructure as Code (IaC)** tools such as **Terraform** and **Ansible**.
+This repository contains resources and configurations for setting up Continuous Integration (CI) and Continuous Deployment (CD) pipelines. The pipelines are designed to automate infrastructure provisioning, application deployments, and resource management across various environments (e.g., Azure, AWS, GCP, etc.). The goal is to provide automated workflows to streamline deployments and infrastructure management, leveraging **Infrastructure as Code (IaC)** tools such as **Terraform** .
 
 ## Features
 
