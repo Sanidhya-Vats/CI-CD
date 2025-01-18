@@ -1,0 +1,132 @@
+
+pool: Daisy Game Pool
+name: Stage Pipeline Yaml
+trigger: none 
+stages:
+
+  - stage: Testing
+    
+    displayName: Testing
+    jobs:
+      - job: TfSec
+        condition: Always()
+        displayName: TfSec
+        steps:
+          - task: tfsec@1
+            inputs:
+              version: 'v1.28.11'
+              debug: true
+              args: '--tfvars-file="environments\dev\terraform.tfvars'
+              dir: '$(System.DefaultWorkingDirectory)'        
+      
+      - job: Checkov
+        condition: Always()
+        dependsOn: TfSec
+        displayName: Checkov 
+        steps:
+          - task: CmdLine@2
+            condition: Always()
+            displayName: Checkov
+            inputs:
+              script: 'checkov -d . -o junitxml > checkovresult.xml'
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+          - task: PublishTestResults@2
+            condition: Always()
+            displayName: Publish Result
+            inputs:
+                testResultsFormat: 'JUnit'
+                testResultsFiles: '*.xml'
+                testRunTitle: 'Checkov'
+
+      - job: Tflint
+        condition: Always()
+        dependsOn: Checkov
+        displayName: Tflint
+        steps:
+          - task: CmdLine@2
+            condition: Always()
+            displayName: Tflint
+            inputs:
+              script: 'tflint --chdir=. --recursive -f junit >tflintresult.xml'
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+
+          - task: PublishTestResults@2
+            condition: Always()
+            displayName: Publish Result
+            inputs:
+                testResultsFormat: 'JUnit'
+                testResultsFiles: '*.xml'
+                testRunTitle: 'Tflint'
+
+
+  - stage: TerraformPlanning
+    displayName: Terraform Planning
+    jobs:
+      - job: TerraformPlanning
+        displayName: Terraform Planning
+        pool: Daisy Game Pool
+        steps:
+          - task: TerraformTaskV4@4
+            displayName: Terraform Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              backendServiceArm: 'DoremonConnection'
+              backendAzureRmResourceGroupName: 'pipeline'
+              backendAzureRmStorageAccountName: 'pipelinestorage12account'
+              backendAzureRmContainerName: 'doremon'
+              backendAzureRmKey: 'dhondhu'
+            
+
+
+          - task: TerraformTaskV4@4
+            displayName: Terraform Plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              environmentServiceNameAzureRM: 'DoremonConnection'
+
+
+  - stage: Implementation
+    displayName: Implementation
+    jobs:
+      - job: ManualValidiation
+        displayName: Manual Validiation
+        pool: server
+        steps:
+          - task: ManualValidation@1
+            timeoutInMinutes: 1440
+            inputs:
+              notifyUsers: |
+                Sanidhya1119@outlook.com
+              instructions: 'Please validate the build configuration and resume'
+              onTimeout: 'resume'
+
+      - job: TerraformApply
+        displayName: Terraform Apply
+        dependsOn: ManualValidiation
+        pool: Daisy Game Pool
+        steps:
+          - task: TerraformTaskV4@4
+            displayName: Terraform Init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              backendServiceArm: 'DoremonConnection'
+              backendAzureRmResourceGroupName: 'pipeline'
+              backendAzureRmStorageAccountName: 'pipelinestorage12account'
+              backendAzureRmContainerName: 'doremon'
+              backendAzureRmKey: 'dhondhu'
+              
+          - task: TerraformTaskV4@4
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+              environmentServiceNameAzureRM: 'DoremonConnection'
+        

@@ -1,0 +1,6 @@
+.terraform
+.tflint.hcl
+.terraform.lock.hcl
+terraform.tfstate
+go.*
+terraform.tfstate.backup
