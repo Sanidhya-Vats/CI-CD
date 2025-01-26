@@ -1,0 +1,56 @@
+stages:
+  - stage: Testing
+    
+    displayName: Testing
+    jobs:
+      - job: TfSec
+        condition: Always()
+        displayName: TfSec
+        steps:
+          - task: tfsec@1
+            inputs:
+              version: 'v1.28.11'
+              debug: true
+              args: '--tfvars-file="environments\dev\terraform.tfvars'
+              dir: '$(System.DefaultWorkingDirectory)'        
+      
+      - job: Checkov
+        condition: Always()
+        dependsOn: TfSec
+        displayName: Checkov 
+        steps:
+          - task: CmdLine@2
+            condition: Always()
+            displayName: Checkov
+            inputs:
+              script: 'checkov -d . -o junitxml > checkovresult.xml'
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+          - task: PublishTestResults@2
+            condition: Always()
+            displayName: Publish Result
+            inputs:
+                testResultsFormat: 'JUnit'
+                testResultsFiles: '*.xml'
+                testRunTitle: 'Checkov'
+
+      - job: Tflint
+        condition: Always()
+        dependsOn: Checkov
+        displayName: Tflint
+        steps:
+          - task: CmdLine@2
+            condition: Always()
+            displayName: Tflint
+            inputs:
+              script: 'tflint --chdir=. --recursive -f junit >tflintresult.xml'
+              workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+
+          - task: PublishTestResults@2
+            condition: Always()
+            displayName: Publish Result
+            inputs:
+                testResultsFormat: 'JUnit'
+                testResultsFiles: '*.xml'
+                testRunTitle: 'Tflint'

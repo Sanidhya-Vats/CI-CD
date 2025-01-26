@@ -1,0 +1,6 @@
+pool: Daisy Game Pool
+trigger: none
+jobs:
+  - template: ../templates/jobs/template-job-tf-intplan.yml
+  - template: ../templates/jobs/template-job-manualval.yml
+  - template: ../templates/jobs/template-job-tf-initapply.yml

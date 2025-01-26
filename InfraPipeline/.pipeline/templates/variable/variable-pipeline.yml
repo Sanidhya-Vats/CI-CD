@@ -1,0 +1,7 @@
+variables:
+  backendServiceArm: 'Doreman'
+  backendAzureRmResourceGroupName: 'Sanidhya'
+  backendAzureRmStorageAccountName: 'storagetoserver '
+  backendAzureRmContainerName: 'servicecon'
+  backendAzureRmKey: 'terraform.tfstate'
+  workdir: $(System.DefaultWorkingDirectory)/environments/dev

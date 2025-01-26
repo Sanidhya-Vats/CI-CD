@@ -1,0 +1,15 @@
+pool: Daisy Game Pool
+trigger: none
+parameters:
+  - name: Environment
+    type: string
+    default: dev
+    values:
+      - prod
+      - dev
+variables:
+  - template: ../templates/variable/variable-pipeline.yml
+stages:
+  - template: ../templates/generic-env/env-templpate-pipeline.yml
+    parameters:
+      env: ${{parameters.Environment}}

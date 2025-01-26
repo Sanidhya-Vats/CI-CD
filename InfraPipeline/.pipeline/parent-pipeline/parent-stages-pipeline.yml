@@ -1,0 +1,14 @@
+pool: Daisy Game Pool
+trigger: none
+variables:
+  backendServiceArm: 'Doreman'
+  backendAzureRmResourceGroupName: 'Sanidhya'
+  backendAzureRmStorageAccountName: 'storagetoserver '
+  backendAzureRmContainerName: 'servicecon'
+  backendAzureRmKey: 'terraform.tfstate'
+stages:
+  - template: ../templates/stages/template-stage-tf-testing.yml
+  - template: ../templates/stages/template-stage-tf-planing.yml
+  - template: ../templates/stages/template-stage-tf-applying.yml
+    
+    

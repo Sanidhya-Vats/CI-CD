@@ -1,0 +1,8 @@
+steps:
+  - task: TerraformTaskV4@4
+    displayName: Terraform Plan
+    inputs:
+      provider: 'azurerm'
+      command: 'plan'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+      environmentServiceNameAzureRM: 'DoremonConnection'

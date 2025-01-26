@@ -1,0 +1,13 @@
+jobs:
+  - job: ManualValidiation
+    displayName: Manual Validiation
+    dependsOn: TerraformPlanning
+    pool: server
+    steps:
+      - task: ManualValidation@1
+        timeoutInMinutes: 1440
+        inputs:
+          notifyUsers: |
+            Sanidhya1119@outlook.com
+          instructions: 'Please validate the build configuration and resume'
+          onTimeout: 'resume'

@@ -1,0 +1,16 @@
+pool: Daisy Game Pool
+trigger: 
+  batch: true
+  branches: 
+    include:
+      - main
+  paths:
+    include:
+      - environments\dev\prod.terraform.tfvars
+
+variables:
+  - template: ../templates/variable/variable-pipeline.yml
+stages:
+  - template: ../templates/generic-env/env-templpate-pipeline.yml
+    parameters:
+      env: prod

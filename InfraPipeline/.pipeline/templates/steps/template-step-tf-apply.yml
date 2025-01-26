@@ -1,0 +1,7 @@
+steps:
+  - task: TerraformTaskV4@4
+    inputs:
+      provider: 'azurerm'
+      command: 'apply'
+      workingDirectory: '$(System.DefaultWorkingDirectory)/environments/dev'
+      environmentServiceNameAzureRM: 'DoremonConnection'

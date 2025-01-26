@@ -1,0 +1,7 @@
+pool: Daisy Game Pool
+name: Pipeline Calling step templates
+trigger: none
+steps:
+  - template: ../templates/steps/template-step-tf-init.yml
+  - template: ../templates/steps/template-step-tf-plan.yml
+  - template: ../templates/steps/template-step-tf-apply.yml

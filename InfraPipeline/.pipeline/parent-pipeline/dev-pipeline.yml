@@ -1,0 +1,22 @@
+pool: Daisy Game Pool
+trigger: 
+  batch: true
+  branches: 
+    include:
+      - main
+  paths:
+    include:
+      - environments\dev\dev.terraform.tfvars
+variables:
+  backendServiceArm: 'Doreman'
+  backendAzureRmResourceGroupName: 'Sanidhya'
+  backendAzureRmStorageAccountName: 'storagetoserver '
+  backendAzureRmContainerName: 'servicecon'
+  backendAzureRmKey: 'terraform.tfstate'
+  workdir: $(System.DefaultWorkingDirectory)/environments/dev
+stages:
+  - template: ../templates/generic-env/env-templpate-pipeline.yml
+    parameters:
+      env: dev
+    
+    
